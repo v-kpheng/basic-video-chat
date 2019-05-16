@@ -15,14 +15,22 @@ var SERVER_BASE_URL = 'https://v-kpheng-sample-app.herokuapp.com';
 fetch(SERVER_BASE_URL + '/session').then(function(res) {
   return res.json()
 }).then(function(res) {
-  apiKey = res.apiKey;
-  sessionId = res.sessionId;
-  token = res.token;
+  apiKey = "API_KEY_HERE" || res.apiKey;
+  sessionId = "SESSION_ID_HERE" || res.sessionId;
+  token = "TOKEN_HERE" || res.token;
   initializeSession();
 }).catch(handleError);
 
 function initializeSession() {
   var session = OT.initSession(apiKey, sessionId);
+
+  document.getElementById('subscriber').addEventListener('click', function() {
+    console.log('clicked on an element on subscriber');
+  });
+
+  document.getElementById('dblclick_area').addEventListener('dblclick', function() {
+    console.log('you double-clicked');
+  });
 
   // Subscribe to a newly created stream
   session.on('streamCreated', function(event) {
