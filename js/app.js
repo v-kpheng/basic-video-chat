@@ -11,26 +11,19 @@ function handleError(error) {
 }
 
 // (optional) add server code here
-var SERVER_BASE_URL = 'https://v-kpheng-sample-app.herokuapp.com';
+var SERVER_BASE_URL = 'https://vkpheng-sample-app-2.herokuapp.com';
 fetch(SERVER_BASE_URL + '/session').then(function(res) {
-  return res.json()
+  return res.json();
 }).then(function(res) {
-  apiKey = "API_KEY_HERE" || res.apiKey;
-  sessionId = "SESSION_ID_HERE" || res.sessionId;
-  token = "TOKEN_HERE" || res.token;
+  apiKey = res.apiKey;
+  sessionId = res.sessionId;
+  token = res.token;
+
   initializeSession();
 }).catch(handleError);
 
 function initializeSession() {
   var session = OT.initSession(apiKey, sessionId);
-
-  document.getElementById('subscriber').addEventListener('click', function() {
-    console.log('clicked on an element on subscriber');
-  });
-
-  document.getElementById('dblclick_area').addEventListener('dblclick', function() {
-    console.log('you double-clicked');
-  });
 
   // Subscribe to a newly created stream
   session.on('streamCreated', function(event) {
@@ -41,12 +34,18 @@ function initializeSession() {
     }, handleError);
   });
 
-  // Create a publisher
-  var publisher = OT.initPublisher('publisher', {
-    insertMode: 'append',
-    width: '100%',
-    height: '100%'
-  }, handleError);
+  const publishers = [];
+  const NUM_PUBLISHERS = 6;
+
+  for( let i = 0; i < NUM_PUBLISHERS; i++ ) {
+    const publisher = OT.initPublisher('publisher', {
+      insertMode: 'append',
+      width: '100%',
+      height: '100%'
+    }, handleError);
+
+    publishers.push(publisher);
+  }
 
   // Connect to the session
   session.connect(token, function(error) {
@@ -54,7 +53,9 @@ function initializeSession() {
     if (error) {
       handleError(error);
     } else {
-      session.publish(publisher, handleError);
+      publishers.forEach(publisher => {
+        session.publish(publisher, handleError);
+      });
     }
   });
 }
